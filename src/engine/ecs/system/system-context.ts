@@ -135,6 +135,10 @@ export class SystemContext {
     );
   };
 
+  componentId = (namespacedName: string) => {
+    return this._world?.componentId(namespacedName) ?? -1;
+  }
+
   _updateDeltaTime = (deltaTime: number) => {
     this.deltaTime = deltaTime;
   };

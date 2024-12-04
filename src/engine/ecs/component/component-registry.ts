@@ -7,6 +7,7 @@ export class ComponentRegistry {
   #nextComponentId = 0;
   #idToBags: Map<ComponentId, ComponentBag> = new Map();
   #idToName: Map<ComponentId, string> = new Map();
+  #nameToId: Map<string, ComponentId> = new Map();
 
   register: (namespacedName: string) => ComponentId = (
     namespacedName: string,
@@ -15,6 +16,7 @@ export class ComponentRegistry {
     const id = this.#nextComponentId;
     this.#idToBags.set(id, new ComponentBag(id));
     this.#idToName.set(id, namespacedName);
+    this.#nameToId.set(namespacedName, id);
     this.#nextComponentId = id + 1;
     assert(this.#nextComponentId < Number.MAX_SAFE_INTEGER);
     return id;
@@ -31,6 +33,10 @@ export class ComponentRegistry {
   getName = (componentId: ComponentId) => {
     return this.#idToName.get(componentId) ?? "ERROR";
   };
+
+  getIdByName(namespacedName: string): ComponentId {
+    return this.#nameToId.get(namespacedName) ?? -1;
+  }
 
   all() {
     return [...this.#idToName.entries()];

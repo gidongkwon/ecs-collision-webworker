@@ -53,6 +53,10 @@ export class World {
     return this.components.register(namespacedName);
   };
 
+  componentId = (namespacedName: string) => {
+    return this.components.getIdByName(namespacedName);
+  }
+
   addComponent = (
     entity: Entity,
     componentId: ComponentId,
