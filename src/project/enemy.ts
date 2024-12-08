@@ -1,4 +1,3 @@
-import { toRadian } from "gl-matrix/common";
 import type { Sprite } from "../engine/2d/sprite";
 import type { Transform } from "../engine/2d/transform";
 import { read, write } from "../engine/ecs/component/component-access-descriptor";
@@ -6,8 +5,8 @@ import type { System } from "../engine/ecs/system/system";
 import { Timer } from "../engine/timer/timer";
 import type { BulletShooter, Collider, Velocity, Bullet } from "./definitions";
 
-const maxEnemey = 10;
-// const maxEnemey = 300;
+// const maxEnemey = 10;
+const maxEnemey = 300;
 let currentEnemy = 0;
 const timer = new Timer(0.03, { type: "infinite" });
 

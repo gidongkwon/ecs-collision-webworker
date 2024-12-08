@@ -85,5 +85,27 @@ engine.world.addSystem("update", () => {
   entitiesText.textContent = `Entities: ${engine.world.entities.alives().length}`;
 })
 
+// Play/Pause
+const playPauseButton = document.querySelector<HTMLButtonElement>("#play-pause-button")!;
+playPauseButton.addEventListener("click", () => {
+  if (engine.isRunning) {
+    engine.pause();
+    playPauseButton.textContent = "Play";
+  } else {
+    engine.run();
+    playPauseButton.textContent = "Pause";
+  }
+});
+
+// Next Frame
+const nextFrameButton = document.querySelector<HTMLButtonElement>("#next-frame-button")!;
+nextFrameButton.addEventListener("click", () => {
+  engine.run();
+  requestAnimationFrame(() => {
+    engine.cleanup();
+  });
+});
+
+
 engine.world.callInitSystems();
 engine.run();

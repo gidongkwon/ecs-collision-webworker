@@ -57,6 +57,7 @@ export class Engine {
   wireframeProgramInfo!: WireframeShader;
 
   // fps/time tracking
+  isRunning = false;
   private _then = 0;
   private _frameTimes: number[] = [];
   private _frameCursor = 0;
@@ -83,10 +84,17 @@ export class Engine {
   }
 
   run = () => {
+    this.isRunning = true;
     this._rafHandle = requestAnimationFrame(this.step);
   };
 
+  pause = () => {
+    this.isRunning = false;
+    cancelAnimationFrame(this._rafHandle);
+  };
+
   cleanup = () => {
+    this.isRunning = false;
     this.world.cleanup();
     cancelAnimationFrame(this._rafHandle);
   };
@@ -245,8 +253,10 @@ export class Engine {
     this._frameCursor %= this._framesToAverage;
     this.averageFPS = this._totalFPS / this._frameCounts;
 
-    this.update(deltaTime);
-    this.render();
+    if (this.isRunning) {
+      this.update(deltaTime);
+      this.render();
+    }
 
     this._rafHandle = requestAnimationFrame(this.step);
   };
