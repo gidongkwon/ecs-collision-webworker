@@ -1,6 +1,6 @@
 import { Engine } from './engine/engine';
 import { clearOutsideObjectSystem } from './project/clear';
-import { collisionSystem, hash2d, updateSpatialHashSystem } from './project/collision';
+import { collisionSystem, createBoundsRenderSystem, hash2d, updateSpatialHashSystem } from './project/collision';
 import type { Collider } from './project/definitions';
 import { enemyShootSystem, enemySpawnSystem } from './project/enemy';
 import { createPlayerSystem, playerMoveSystem, playerShootSystem } from './project/player';
@@ -65,44 +65,8 @@ engine.signals.anyEntityDespawned.register((data) => {
   }
 });
 
-// const scoreSystem: System = (context) => {
-//   for (const event of context.readEvent("collision")) {
-//     assert(event instanceof CollisionEvent);
-//     assert(event.a !== event.b);
-//     let bulletEntity = event.a;
-//     let targetEntity = event.b;
-//     if (!context.hasComponent(bulletEntity, BulletId)) {
-//       bulletEntity = event.b;
-//       targetEntity = event.a;
-//     }
-
-//     // both are not bullet. continue.
-//     if (!context.hasComponent(bulletEntity, BulletId)) {
-//       continue;
-//     }
-
-//     const bullet = context.getComponent(
-//       bulletEntity,
-//       read(BulletId),
-//     ) as Bullet;
-
-//     const scoredPlayerComponent = context.getComponent(
-//       bullet.owner,
-//       write(PlayerId),
-//     ) as Player;
-//     if (
-//       bullet.owner !== targetEntity &&
-//       context.hasComponent(targetEntity, EnemyId) &&
-//       scoredPlayerComponent != null
-//     ) {
-//       console.log(context._world?.entities.entityToName.get(targetEntity));
-//       scoredPlayerComponent.score += 1;
-//       context.despawn(targetEntity);
-//     }
-//   }
-// };
-
 engine.world.addSystem("init", createPlayerSystem);
+engine.world.addSystem("render", createBoundsRenderSystem(engine));
 engine.world.addSystem("update", playerMoveSystem);
 engine.world.addSystem("update", playerShootSystem);
 engine.world.addSystem("update", enemySpawnSystem);

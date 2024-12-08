@@ -52,8 +52,8 @@ export const enemySpawnSystem: System = (context) => {
         {
           delayTimer: new Timer(0.3, { type: "once" }),
           offset: {
-            x: 0,
-            y: 0,
+            x: -enemyTexture.width * scale,
+            y: enemyTexture.height * scale / 2,
           },
         } satisfies BulletShooter,
       ],
@@ -61,6 +61,7 @@ export const enemySpawnSystem: System = (context) => {
         ColliderId,
         {
           data: -1,
+          collidedThisFrame: false,
           bounds: {
             x: 0,
             y: 0,
@@ -111,10 +112,10 @@ export const enemyShootSystem: System = (context) => {
           TransformId,
           {
             position: {
-              x: enemyTransform.position.x,
-              y: enemyTransform.position.y,
+              x: enemyTransform.position.x + bulletShooter.offset.x,
+              y: enemyTransform.position.y + bulletShooter.offset.y,
             },
-            rotation: toRadian(90),
+            rotation: 0,
             scale: {
               x: scale,
               y: scale,
@@ -134,11 +135,12 @@ export const enemyShootSystem: System = (context) => {
           ColliderId,
           {
             data: -1,
+            collidedThisFrame: false,
             bounds: {
               x: 0,
               y: 0,
-              width: playerBulletTexture.height * scale,
-              height: playerBulletTexture.width * scale,
+              width: playerBulletTexture.width * scale,
+              height: playerBulletTexture.height * scale,
             },
           } satisfies Collider,
         ],

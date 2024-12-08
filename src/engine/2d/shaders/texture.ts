@@ -1,5 +1,6 @@
 export interface ProgramInfo {
   program: WebGLProgram;
+  vertexArray: WebGLVertexArrayObject;
   attribLocations: {
     position: number;
     texCoord: number;

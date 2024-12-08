@@ -21,7 +21,9 @@ export interface BulletShooter {
     y: number;
   };
 }
-export interface Collider extends BoundsWithData<Entity> {}
+export interface Collider extends BoundsWithData<Entity> {
+  collidedThisFrame: boolean;
+}
 
 export class CollisionEvent extends ScatterEvent {
   name = "collision";

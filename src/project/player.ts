@@ -15,6 +15,8 @@ export const createPlayerSystem: System = (context) => {
   const PlayerId = context.componentId("@my/Player");
   const BulletShooterId = context.componentId("@my/BulletShooter");
   const ColliderId = context.componentId("@my/Collider");
+
+  const scale = 0.5;
       
   context.spawn("Player", [
     [
@@ -24,10 +26,10 @@ export const createPlayerSystem: System = (context) => {
           x: 100,
           y: 100,
         },
-        rotation: Math.PI,
+        rotation: 0,
         scale: {
-          x: 0.5,
-          y: 0.5,
+          x: scale,
+          y: scale,
         },
       },
     ],
@@ -53,8 +55,8 @@ export const createPlayerSystem: System = (context) => {
         bounds: {
           x: 0,
           y: 0,
-          width: playerTexture.width,
-          height: playerTexture.height,
+          width: playerTexture.width * scale,
+          height: playerTexture.height * scale,
         },
       },
     ],
@@ -118,10 +120,10 @@ export const playerShootSystem: System = (context) => {
             TransformId,
             {
               position: {
-                x: playerTransform.position.x,
-                y: playerTransform.position.y,
+                x: playerTransform.position.x + bulletShooter.offset.x,
+                y: playerTransform.position.y + bulletShooter.offset.y,
               },
-              rotation: toRadian(90),
+              rotation: 0,
               scale: {
                 x: 1,
                 y: 1,
@@ -141,11 +143,12 @@ export const playerShootSystem: System = (context) => {
             ColliderId,
             {
               data: -1,
+              collidedThisFrame: false,
               bounds: {
                 x: 0,
                 y: 0,
-                width: playerBulletTexture.height,
-                height: playerBulletTexture.width,
+                width: playerBulletTexture.width,
+                height: playerBulletTexture.height,
               },
             } satisfies Collider,
           ],

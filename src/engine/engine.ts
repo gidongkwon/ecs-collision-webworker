@@ -1,5 +1,5 @@
 import { createProgramFromSources } from "./2d/gl";
-import { type ProgramInfo, fragment, vertex } from "./2d/shader";
+import { type ProgramInfo, fragment, vertex } from "./2d/shaders/texture";
 import { createSpriteRenderSystem } from "./2d/sprite-render-system";
 import { Assets } from "./asset/assets";
 import { World } from "./ecs/world";
@@ -9,6 +9,7 @@ import { EngineSignals } from "./signal/engine-signals";
 import { resizeCanvasToDisplaySize } from "./utils/canvas";
 import { SystemContext } from "./ecs/system/system-context";
 import { systemPhases, type SystemPhase } from "./ecs/system/system";
+import { initWireframeShader, type WireframeShader } from "./2d/shaders/wireframe";
 
 type Scene = {
   name: string;
@@ -53,7 +54,7 @@ export class Engine {
 
   // renderer
   programInfo!: ProgramInfo;
-  quadVAO!: WebGLVertexArrayObject;
+  wireframeProgramInfo!: WireframeShader;
 
   // fps/time tracking
   private _then = 0;
@@ -136,6 +137,7 @@ export class Engine {
 
     this.programInfo = {
       program,
+      vertexArray: gl.createVertexArray()!,
       attribLocations: {
         position: gl.getAttribLocation(program, "a_position"),
         texCoord: gl.getAttribLocation(program, "a_texCoord"),
@@ -150,9 +152,7 @@ export class Engine {
       },
     };
 
-    // biome-ignore lint/style/noNonNullAssertion: should have
-    this.quadVAO = gl.createVertexArray()!;
-    gl.bindVertexArray(this.quadVAO);
+    gl.bindVertexArray(this.programInfo.vertexArray);
     const positionBuffer = gl.createBuffer();
     gl.enableVertexAttribArray(this.programInfo.attribLocations.position);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -182,6 +182,31 @@ export class Engine {
     gl.enableVertexAttribArray(this.programInfo.attribLocations.texCoord);
     gl.vertexAttribPointer(
       this.programInfo.attribLocations.texCoord,
+      2,
+      gl.FLOAT,
+      false,
+      0,
+      0,
+    );
+
+    this.wireframeProgramInfo = initWireframeShader(gl);
+    gl.bindVertexArray(this.wireframeProgramInfo.vertexArray);
+    const wireframePositionBuffer = gl.createBuffer();
+    gl.enableVertexAttribArray(this.wireframeProgramInfo.attribLocations.position);
+    gl.bindBuffer(gl.ARRAY_BUFFER, wireframePositionBuffer);
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([
+        0.0, 0.0, 1.0, 0.0,
+        1.0, 0.0, 1.0, 1.0,
+        1.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 0.0, 0.0,
+      ]),
+      gl.STATIC_DRAW,
+    );
+
+    gl.vertexAttribPointer(
+      this.wireframeProgramInfo.attribLocations.position,
       2,
       gl.FLOAT,
       false,

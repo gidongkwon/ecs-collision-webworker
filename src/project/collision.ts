@@ -1,8 +1,11 @@
+import { Mat4 } from "gl-matrix";
+import type { Sprite } from "../engine/2d/sprite";
 import type { Transform } from "../engine/2d/transform";
 import { SpatialHash } from "../engine/collections/spatial-hash";
 import { read, write } from "../engine/ecs/component/component-access-descriptor";
 import type { Entity } from "../engine/ecs/entity/entity";
 import type { System } from "../engine/ecs/system/system";
+import type { Engine } from "../engine/engine";
 import { type Collider, CollisionEvent } from "./definitions";
 
 export const hash2d = new SpatialHash();
@@ -60,12 +63,13 @@ const collidedEntityCache = new Map<Entity, Set<Entity>>();
 const queryResult: Set<Collider> = new Set();
 export const collisionSystem: System = (context) => {
   const ColliderId = context.componentId("@my/Collider");
-  
+
   collidedEntityCache.clear();
   context.each(
     [read(ColliderId)],
     (entityA, rawComponentsA) => {
       const [collider] = rawComponentsA as [Collider];
+      collider.collidedThisFrame = false;
 
       queryResult.clear();
       // quadtree.query(collider.bounds, queryResult);
@@ -93,7 +97,35 @@ export const collisionSystem: System = (context) => {
           "collision",
           new CollisionEvent(entityA, entityB),
         );
+
+        collider.collidedThisFrame = true;
+        result.collidedThisFrame = true;
       }
     },
   );
 };
+
+export function createBoundsRenderSystem(engine: Engine): System {
+  return (context) => {
+    const ColliderId = context.componentId("@my/Collider");
+  
+    context.each(
+      [read(ColliderId)],
+      (_, rawComponents) => {
+        const [collider] = rawComponents as [Collider];
+  
+        // render wireframe of the collider
+        engine.gl.useProgram(engine.wireframeProgramInfo.program);
+
+        const matrix = Mat4.create();
+        Mat4.orthoNO(matrix, 0, engine.gl.canvas.width, engine.gl.canvas.height, 0, -1, 1);
+        matrix.translate([collider.bounds.x, collider.bounds.y, 0]);
+        matrix.scale([collider.bounds.width, collider.bounds.height, 1]);
+        engine.gl.uniform1f(engine.wireframeProgramInfo.uniformLocations.collisionFlag, collider.collidedThisFrame ? 0 : 1);
+        engine.gl.uniformMatrix4fv(engine.wireframeProgramInfo.uniformLocations.matrix, false, matrix);
+        
+        engine.gl.drawArrays(engine.gl.LINES, 0, 8);
+      },
+    );
+  };
+}

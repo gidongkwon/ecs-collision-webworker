@@ -1,10 +1,9 @@
 import { Mat4 } from "gl-matrix";
-import type { ProgramInfo } from "./shader";
+import type { ProgramInfo } from "./shaders/texture";
 
 export function drawImage(
   gl: WebGL2RenderingContext,
   programInfo: ProgramInfo,
-  quadVAO: WebGLVertexArrayObject,
   texture: WebGLTexture,
   textureWidth: number,
   textureHeight: number,
@@ -20,7 +19,7 @@ export function drawImage(
   srcRotation?: number,
 ) {
   gl.useProgram(programInfo.program);
-  gl.bindVertexArray(quadVAO);
+  gl.bindVertexArray(programInfo.vertexArray);
 
   const textureUnit = 0;
   gl.uniform1i(programInfo.uniformLocations.texture, textureUnit);

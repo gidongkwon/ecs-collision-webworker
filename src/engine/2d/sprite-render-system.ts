@@ -30,7 +30,6 @@ export function createSpriteRenderSystem(
         drawImage(
           engine.gl,
           engine.programInfo,
-          engine.quadVAO,
           sprite.textureInfo.texture,
           sprite.textureInfo.width,
           sprite.textureInfo.height,
