@@ -120,6 +120,7 @@ export function createBoundsRenderSystem(engine: Engine): System {
   
         // render wireframe of the collider
         engine.gl.useProgram(engine.wireframeProgramInfo.program);
+        engine.gl.bindVertexArray(engine.wireframeProgramInfo.vertexArray);
 
         const matrix = Mat4.create();
         Mat4.orthoNO(matrix, 0, engine.gl.canvas.width, engine.gl.canvas.height, 0, -1, 1);
