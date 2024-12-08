@@ -64,13 +64,17 @@ const queryResult: Set<Collider> = new Set();
 export const collisionSystem: System = (context) => {
   const ColliderId = context.componentId("@my/Collider");
 
+  context.each(
+    [read(ColliderId)], (_, [collider]) => {
+      collider.collidedThisFrame = false;
+    }
+  );
+
   collidedEntityCache.clear();
   context.each(
     [read(ColliderId)],
     (entityA, rawComponentsA) => {
       const [collider] = rawComponentsA as [Collider];
-      collider.collidedThisFrame = false;
-
       queryResult.clear();
       // quadtree.query(collider.bounds, queryResult);
       hash2d.query(collider.bounds, queryResult);
