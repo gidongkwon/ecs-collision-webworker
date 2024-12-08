@@ -21,3 +21,20 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+#resources {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+#resources > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: #333;
+}

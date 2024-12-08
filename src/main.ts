@@ -106,6 +106,23 @@ nextFrameButton.addEventListener("click", () => {
   });
 });
 
+// Resources
+const resources = document.querySelector<HTMLDivElement>("#resources")!;
+engine.project!.assets.forEach((asset) => {
+  const container = document.createElement("div");
+  const img = document.createElement("img");
+  img.src = asset.path;
+  container.appendChild(img);
+  
+  const sizeSpan = document.createElement("span");
+  img.onload = () => {
+    sizeSpan.textContent = `${img.width} x ${img.height} (Scale 1x)`;
+  }
+  container.appendChild(sizeSpan);
+
+  resources.appendChild(container);
+});
+
 
 engine.world.callInitSystems();
 engine.run();
