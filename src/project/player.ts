@@ -1,4 +1,3 @@
-import { toRadian } from "gl-matrix/common";
 import type { Sprite } from "../engine/2d/sprite";
 import type { Transform } from "../engine/2d/transform";
 import { read, write } from "../engine/ecs/component/component-access-descriptor";
@@ -7,7 +6,6 @@ import { Timer } from "../engine/timer/timer";
 import type { BulletShooter, Velocity, Bullet, Collider } from "./definitions";
 
 export const createPlayerSystem: System = (context) => {
-  console.log("hello");
   const playerTexture = context.assets.texture("player-ship")!;
 
   const TransformId = context.componentId("@scatter/Transform");
