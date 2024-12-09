@@ -10,7 +10,7 @@ export function createSpriteRenderSystem(
   componentIds: ComponentId[],
   engine: Engine,
 ) {
-  return (context: SystemContext) => {
+  return async (context: SystemContext) => {
     context.each(
       componentIds.map((id) => read(id)),
       (_, [rawTransform, rawSprite]) => {

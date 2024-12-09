@@ -239,7 +239,7 @@ export class Engine {
     this.world.addSystem("render", spriteRenderSystem);
   };
 
-  private step: FrameRequestCallback = (time) => {
+  private step: FrameRequestCallback = async (time) => {
     const now = time / 1000;
     const deltaTime = Math.min(0.1, now - this._then);
     this._then = now;
@@ -254,15 +254,15 @@ export class Engine {
     this.averageFPS = this._totalFPS / this._frameCounts;
 
     if (this.isRunning) {
-      this.update(deltaTime);
+      await this.update(deltaTime);
       this.render();
     }
 
     this._rafHandle = requestAnimationFrame(this.step);
   };
 
-  private update = (deltaTime: number) => {
-    this.world.update(deltaTime);
+  private update = async (deltaTime: number) => {
+    await this.world.update(deltaTime);
   };
 
   private render = () => {

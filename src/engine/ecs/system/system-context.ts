@@ -66,7 +66,7 @@ export class SystemContext {
         callback(
           entity,
           componentIds.map((componentId) =>
-            this._world?.components.get(componentId)?.get(entity),
+            this._world?.components.get(componentId)?.get(entity)!,
           ),
         );
 
@@ -81,7 +81,7 @@ export class SystemContext {
             componentId: descriptor.componentId,
             component: this._world.components
               .get(descriptor.componentId)
-              ?.get(entity),
+              ?.get(entity)!,
           });
         }
       }

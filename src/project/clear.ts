@@ -3,7 +3,7 @@ import type { Transform } from "../engine/2d/transform";
 import { read } from "../engine/ecs/component/component-access-descriptor";
 import type { System } from "../engine/ecs/system/system";
 
-export const clearOutsideObjectSystem: System = (context) => {
+export const clearOutsideObjectSystem: System = async (context) => {
   const TransformId = context.componentId("@scatter/Transform");
   const SpriteId = context.componentId("@scatter/Sprite");
   const RemoveOnOutsideId = context.componentId("@my/RemoveOnOutside");

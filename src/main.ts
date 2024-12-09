@@ -80,7 +80,7 @@ engine.world.addSystem("update", clearOutsideObjectSystem);
 const fpsText = document.querySelector<HTMLSpanElement>("#fps")!;
 const entitiesText = document.querySelector<HTMLSpanElement>("#entities")!;
 
-engine.world.addSystem("update", () => {
+engine.world.addSystem("update", async () => {
   fpsText.textContent = `FPS: ${engine.averageFPS.toFixed(2)}`;
   entitiesText.textContent = `Entities: ${engine.world.entities.alives().length}`;
 })

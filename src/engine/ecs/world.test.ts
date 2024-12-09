@@ -5,7 +5,7 @@ import { World } from "./world";
 test("addSystem/hasSystem", () => {
   const world = new World(new EngineSignals());
   let count = 0;
-  const system = () => {
+  const system = async () => {
     count++;
   };
   expect(world.hasSystem("update", system)).toBe(false);
@@ -15,7 +15,7 @@ test("addSystem/hasSystem", () => {
 
 test("removeSystem", () => {
   const world = new World(new EngineSignals());
-  const system = () => {};
+  const system = async () => {};
   expect(world.hasSystem("update", system)).toBe(false);
   world.addSystem("update", system);
   expect(world.hasSystem("update", system)).toBe(true);
@@ -26,7 +26,7 @@ test("removeSystem", () => {
 test("update", () => {
   const world = new World(new EngineSignals());
   let count = 0;
-  const system = () => {
+  const system = async () => {
     count++;
   };
 

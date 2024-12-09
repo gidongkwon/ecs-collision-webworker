@@ -131,11 +131,11 @@ export class World {
     this.eventQueues.set(name, []);
   };
 
-  callSystems = (systems: System[] | undefined) => {
+  callSystems = async (systems: System[] | undefined) => {
     if (systems != null) {
       for (const system of systems) {
         try {
-          system(this.context, read, write, Timer);
+          await system(this.context, read, write, Timer);
         } catch (e) {
           console.error(e);
         }
@@ -143,14 +143,14 @@ export class World {
     }
   };
 
-  update = (deltaTime: number) => {
+  update = async (deltaTime: number) => {
     this.context._updateDeltaTime(deltaTime);
 
     if (!this.isInitSystemsCalled) {
       return;
     }
 
-    this.callSystems(this.systems.get("update"));
+    await this.callSystems(this.systems.get("update"));
 
     // TODO: find out whether to move event stuff to engine
     this.clearEventQueues();

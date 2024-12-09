@@ -1,5 +1,4 @@
 import { Mat4 } from "gl-matrix";
-import type { Sprite } from "../engine/2d/sprite";
 import type { Transform } from "../engine/2d/transform";
 import { SpatialHash } from "../engine/collections/spatial-hash";
 import { read, write } from "../engine/ecs/component/component-access-descriptor";
@@ -7,10 +6,11 @@ import type { Entity } from "../engine/ecs/entity/entity";
 import type { System } from "../engine/ecs/system/system";
 import type { Engine } from "../engine/engine";
 import { type Collider, CollisionEvent } from "./definitions";
+import { SystemContext } from "../engine/ecs/system/system-context";
 
 export const hash2d = new SpatialHash();
 
-export const updateSpatialHashSystem: System = (context) => {
+export const updateSpatialHashSystem: System = async (context) => {
   const TransformId = context.componentId("@scatter/Transform");
   const ColliderId = context.componentId("@my/Collider");
 
@@ -60,57 +60,81 @@ export const updateSpatialHashSystem: System = (context) => {
 // };
 
 const collidedEntityCache = new Map<Entity, Set<Entity>>();
-const queryResult: Set<Collider> = new Set();
-export const collisionSystem: System = (context) => {
+const collisionsFromWorkers: [number, number][][] = [];
+const workerPool: Worker[] = [];
+
+export const collisionSystem: System = async (context) => {
   const ColliderId = context.componentId("@my/Collider");
 
   context.each(
-    [read(ColliderId)], (_, [collider]) => {
-      collider.collidedThisFrame = false;
+    [read(ColliderId)],
+    (_, [collider]) => {
+      (collider as Collider).collidedThisFrame = false;
     }
   );
 
   collidedEntityCache.clear();
-  context.each(
-    [read(ColliderId)],
-    (entityA, rawComponentsA) => {
-      const [collider] = rawComponentsA as [Collider];
-      queryResult.clear();
-      // quadtree.query(collider.bounds, queryResult);
-      hash2d.query(collider.bounds, queryResult);
 
-      for (const result of queryResult) {
-        const entityB = result.data;
-        if (entityA === entityB) {
-          continue;
-        }
+  const cells = hash2d.getCells();
+  const cellEntries = Array.from(cells.entries());
+  collisionsFromWorkers.length = cellEntries.length;
 
-        const keyEntity = entityA > entityB ? entityA : entityB;
-        const valueEntity = keyEntity === entityA ? entityB : entityA;
-        if (collidedEntityCache.get(keyEntity)?.has(valueEntity)) {
-          continue;
-        }
+  // 워커 풀 설정
+  while (workerPool.length < cellEntries.length) {
+    const worker = new Worker(new URL('./collision.worker.ts', import.meta.url), { type: 'module' });
+    workerPool.push(worker);
+  }
 
-        let collidedSet = collidedEntityCache.get(keyEntity);
-        if (collidedSet == null) {
-          collidedSet = new Set();
-          collidedEntityCache.set(keyEntity, collidedSet);
-        }
-        collidedSet.add(valueEntity);
-        context.createEvent(
-          "collision",
-          new CollisionEvent(entityA, entityB),
-        );
+  // 워커들의 작업을 Promise로 만들어 대기
+  const workerPromises = cellEntries.map(([_, cellObjects], i) => {
+    return new Promise<void>((resolve) => {
+      const worker = workerPool[i];
 
-        collider.collidedThisFrame = true;
-        result.collidedThisFrame = true;
-      }
-    },
-  );
+      worker.onmessage = (e: MessageEvent) => {
+        collisionsFromWorkers[i] = e.data as [number, number][];
+        resolve();
+      };
+
+      worker.postMessage(Array.from(cellObjects));
+    });
+  });
+
+  // 모든 워커의 작업 완료를 대기
+  await Promise.all(workerPromises);
+
+  const allCollisions = collisionsFromWorkers.flat();
+  handleCollisions(allCollisions, context, ColliderId);
 };
 
+function handleCollisions(collisions: [number, number][], context: SystemContext, ColliderId: number) {
+  for (const [entityA, entityB] of collisions) {
+    const keyEntity = entityA > entityB ? entityA : entityB;
+    const valueEntity = keyEntity === entityA ? entityB : entityA;
+    if (collidedEntityCache.get(keyEntity)?.has(valueEntity)) {
+      continue;
+    }
+
+    let collidedSet = collidedEntityCache.get(keyEntity);
+    if (collidedSet == null) {
+      collidedSet = new Set();
+      collidedEntityCache.set(keyEntity, collidedSet);
+    }
+    collidedSet.add(valueEntity);
+    context.createEvent(
+      "collision",
+      new CollisionEvent(entityA, entityB),
+    );
+
+    // collidedThisFrame 업데이트
+    const colliderA = context.getComponent(entityA, read(ColliderId)) as Collider;
+    const colliderB = context.getComponent(entityB, read(ColliderId)) as Collider;
+    colliderA.collidedThisFrame = true;
+    colliderB.collidedThisFrame = true;
+  }
+}
+
 export function createBoundsRenderSystem(engine: Engine): System {
-  return (context) => {
+  return async (context) => {
     const ColliderId = context.componentId("@my/Collider");
   
     context.each(
