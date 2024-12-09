@@ -6,7 +6,7 @@ import { Timer } from "../engine/timer/timer";
 import type { BulletShooter, Collider, Velocity, Bullet } from "./definitions";
 
 // const maxEnemey = 10;
-const maxEnemey = 300;
+const maxEnemey = 1000;
 let currentEnemy = 0;
 const timer = new Timer(0.03, { type: "infinite" });
 
