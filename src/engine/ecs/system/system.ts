@@ -16,4 +16,4 @@ export type System = (
   write: typeof makeWrite,
   Timer: typeof EngineTimer,
   // biome-ignore lint/suspicious/noConfusingVoidType: void
-) => SystemCleanup | void;
+) => Promise<SystemCleanup | void>;

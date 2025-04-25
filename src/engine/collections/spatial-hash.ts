@@ -55,6 +55,10 @@ export class SpatialHash<TData> {
     }
   };
 
+  getCells(): Map<number, Set<BoundsWithData<TData>>> {
+    return this.buckets;
+  }
+
   private hashPoint(x: number, y: number) {
     // Calculate the grid cell coordinates
     const cellX = Math.floor(x / this.cellSize);

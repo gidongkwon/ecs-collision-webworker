@@ -10,7 +10,7 @@ const maxEnemey = 1000;
 let currentEnemy = 0;
 const timer = new Timer(0.03, { type: "infinite" });
 
-export const enemySpawnSystem: System = (context) => {
+export const enemySpawnSystem: System = async (context) => {
   const enemyTexture = context.assets.texture("enemy-ship")!;
 
   const TransformId = context.componentId("@scatter/Transform");
@@ -73,7 +73,7 @@ export const enemySpawnSystem: System = (context) => {
   }
 };
 
-export const enemyShootSystem: System = (context) => {
+export const enemyShootSystem: System = async (context) => {
   const playerBulletTexture = context.assets.texture("player-bullet")!;
 
   const VelocityId = context.componentId("@my/Velocity");

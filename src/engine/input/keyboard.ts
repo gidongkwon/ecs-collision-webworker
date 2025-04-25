@@ -10,7 +10,7 @@ export class Keyboard {
 
 // phase: init
 export function createKeyboardSystem(document: Document) {
-  return (context: SystemContext) => {
+  return async (context: SystemContext) => {
     const abortController = new AbortController();
     const signal = abortController.signal;
 

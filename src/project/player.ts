@@ -5,7 +5,7 @@ import type { System } from "../engine/ecs/system/system";
 import { Timer } from "../engine/timer/timer";
 import type { BulletShooter, Velocity, Bullet, Collider } from "./definitions";
 
-export const createPlayerSystem: System = (context) => {
+export const createPlayerSystem: System = async (context) => {
   const playerTexture = context.assets.texture("player-ship")!;
 
   const TransformId = context.componentId("@scatter/Transform");
@@ -61,8 +61,9 @@ export const createPlayerSystem: System = (context) => {
   ]);
 }
 
-export const playerMoveSystem: System = (context) => {
-  context.each([write(0), read(1), read(3)], (_, [transform]) => {
+export const playerMoveSystem: System = async (context) => {
+  context.each([write(0), read(1), read(3)], (_, [rawTransform]) => {
+    const transform = rawTransform as Transform;
     const speed = 300;
     if (context.keyboard.isPressed("ArrowLeft")) {
       transform.position.x -= speed * context.deltaTime;
@@ -79,7 +80,7 @@ export const playerMoveSystem: System = (context) => {
   });
 }
 
-export const playerShootSystem: System = (context) => {
+export const playerShootSystem: System = async (context) => {
   const VelocityId = context.componentId("@my/Velocity");
   const TransformId = context.componentId("@scatter/Transform");
   const SpriteId = context.componentId("@scatter/Sprite");

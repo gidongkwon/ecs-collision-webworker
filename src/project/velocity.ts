@@ -3,7 +3,7 @@ import { read, write } from "../engine/ecs/component/component-access-descriptor
 import type { System } from "../engine/ecs/system/system";
 import type { Velocity } from "./definitions";
 
-export const velocitySystem: System = (context) => {
+export const velocitySystem: System = async (context) => {
   const VelocityId = context.componentId("@my/Velocity");
   const TransformId = context.componentId("@scatter/Transform");
   
